@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>電子書籍 出版診断ツール｜経営構造編集 参謀</title>
+<style>
+@media print {
+  .no-print { display: none !important; }
+  body { background: #fff !important; }
+  .tbtn.is-yes { background: #0F6E56 !important; color: #fff !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .tbtn.is-no  { background: #C0392B !important; color: #fff !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .chip.is-selected, .single-chip.is-selected { background: #0F6E56 !important; color: #fff !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .hero { background: #0F6E56 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .score-fill, .progress-fill { background: #1D9E75 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .yes-tag { background: #0F6E56 !important; color: #fff !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .cta-blk { background: #0F6E56 !important; color: #fff !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .answer-item, .score-row, .msg-box, .score-bar, .write-area, .message-area { background: #f7f5f0 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  @page { margin: 10mm 12mm; }
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'Hiragino Kaku Gothic ProN', 'Hiragino Sans', 'Noto Sans JP', sans-serif;
+  background: #f0ede8;
+  color: #1a1a1a;
+  line-height: 1.6;
+}
+.page-wrap { min-height: 100vh; padding: 2rem 1rem; }
+.sheet { max-width: 760px; margin: 0 auto; background: #fff; border-radius: 16px; box-shadow: 0 4px 24px rgba(0,0,0,.08); padding: 2.5rem 2.5rem 2rem; }
+
+.badge { display: inline-block; font-size: 11px; letter-spacing: .1em; color: #888; border: 1px solid #ccc; padding: 4px 14px; border-radius: 20px; margin-bottom: 1.2rem; }
+.header { text-align: center; padding-bottom: 2.5rem; border-bottom: 1px solid #e8e4de; margin-bottom: 2.5rem; }
+.main-title { font-size: 28px; font-weight: 700; margin-bottom: .4rem; }
+.sub-title { font-size: 18px; font-weight: 500; color: #555; margin-bottom: 1rem; }
+.lead { font-size: 13px; color: #777; }
+.name-row { display: flex; gap: 2rem; justify-content: center; margin-top: 1.8rem; flex-wrap: wrap; }
+.name-field label { display: block; font-size: 11px; color: #999; margin-bottom: 4px; }
+.name-field input { border: none; border-bottom: 1.5px solid #ccc; background: transparent; font-size: 15px; font-family: inherit; outline: none; padding: 2px 0; width: 180px; }
+.name-field input:focus { border-bottom-color: #0F6E56; }
+
+.step-section { margin-bottom: 2.5rem; }
+.step-header { display: flex; align-items: baseline; gap: 12px; margin-bottom: .3rem; flex-wrap: wrap; }
+.step-num { font-size: 11px; letter-spacing: .12em; color: #999; font-weight: 600; }
+.step-title { font-size: 17px; font-weight: 700; }
+.step-desc { font-size: 13px; color: #888; margin-bottom: 1.25rem; margin-top: 4px; }
+.detail-flag { font-size: 10px; letter-spacing: .06em; background: #E1F5EE; color: #0F6E56; border-radius: 10px; padding: 2px 9px; }
+
+.q-row { display: flex; align-items: flex-start; gap: 12px; padding: 12px 0; border-bottom: 1px solid #f0ece6; }
+.q-row:last-child { border-bottom: none; }
+.q-num { font-size: 12px; color: #aaa; min-width: 26px; padding-top: 3px; font-weight: 600; }
+.q-text { flex: 1; font-size: 14px; line-height: 1.6; }
+.toggle-group { display: flex; gap: 6px; flex-shrink: 0; }
+.tbtn { font-size: 13px; font-weight: 600; padding: 6px 18px; border-radius: 20px; cursor: pointer; border: 1.5px solid #bbb; background: #f0f0f0; color: #999; transition: all .12s; font-family: inherit; }
+.tbtn.is-yes { background: #0F6E56; border-color: #0F6E56; color: #fff; }
+.tbtn.is-no { background: #C0392B; border-color: #C0392B; color: #fff; }
+
+.score-bar { margin-top: 1.5rem; background: #f7f5f0; border-radius: 10px; padding: 1rem 1.25rem; display: flex; align-items: center; gap: 16px; }
+.progress-track { flex: 1; height: 6px; background: #e0ddd6; border-radius: 3px; overflow: hidden; }
+.progress-fill { height: 100%; background: #1D9E75; border-radius: 3px; transition: width .3s ease; }
+.score-hl { font-size: 14px; font-weight: 600; color: #0F6E56; margin-top: 8px; min-height: 20px; }
+
+.write-area { background: #fff; border: 1px solid #e8e4de; border-radius: 10px; padding: 1rem 1.25rem; margin-bottom: 1rem; }
+.write-label { font-size: 12px; color: #aaa; margin-bottom: 6px; font-weight: 600; }
+.write-q { font-size: 14px; margin-bottom: 8px; line-height: 1.6; font-weight: 500; }
+.divider { height: 1px; background: #f0ece6; margin: .5rem 0; }
+.write-input { width: 100%; border: none; background: transparent; resize: none; font-size: 14px; font-family: inherit; line-height: 1.8; outline: none; min-height: 60px; color: #1a1a1a; }
+.write-input::placeholder { color: #c8c4be; }
+
+.chip-group, .single-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+.chip, .single-chip { font-size: 13px; padding: 6px 16px; border-radius: 20px; border: 1.5px solid #bbb; background: #f0f0f0; cursor: pointer; color: #888; transition: all .12s; font-family: inherit; }
+.chip.is-selected, .single-chip.is-selected { background: #0F6E56; border-color: #0F6E56; color: #fff; font-weight: 600; }
+
+.reader-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+@media (max-width: 600px) { .reader-grid { grid-template-columns: 1fr; } }
+
+.message-area { background: #f7f5f0; border-radius: 12px; padding: 1.5rem; margin-top: 1rem; }
+.message-input { width: 100%; border: none; background: transparent; resize: none; font-size: 14px; font-family: inherit; line-height: 1.8; outline: none; min-height: 90px; }
+
+.gate { text-align: center; padding: 2rem 1.5rem; background: #f7f5f0; border-radius: 12px; margin: 2rem 0; border: 1.5px dashed #ccc; }
+.gate-title { font-size: 15px; font-weight: 700; margin-bottom: .5rem; }
+.gate-desc { font-size: 13px; color: #777; margin-bottom: 1.25rem; line-height: 1.7; }
+.gate-btns { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+.gate-btn-more { padding: 11px 26px; border-radius: 24px; font-size: 14px; font-weight: 600; font-family: inherit; background: #0F6E56; color: #fff; border: none; cursor: pointer; }
+.gate-btn-more:hover { opacity: .85; }
+.gate-btn-skip { padding: 11px 26px; border-radius: 24px; font-size: 14px; font-weight: 600; font-family: inherit; background: transparent; color: #999; border: 1.5px solid #ccc; cursor: pointer; }
+.gate-btn-skip:hover { background: #fff; }
+.detail-zone { display: none; }
+
+.staff-bar { background: #f0f8f5; border: 1.5px solid #5DCAA5; border-radius: 14px; padding: 1.5rem; margin-top: 2rem; }
+.staff-label { font-size: 13px; font-weight: 700; color: #0F6E56; margin-bottom: 12px; }
+.btn-gen { width: 100%; padding: 14px; border-radius: 10px; font-size: 15px; font-weight: 700; font-family: inherit; background: #0F6E56; color: #fff; border: none; cursor: pointer; transition: opacity .15s; }
+.btn-gen:hover { opacity: .85; }
+.btn-gen:disabled { opacity: .5; cursor: not-allowed; }
+.gen-status { font-size: 13px; color: #777; margin-top: 10px; min-height: 18px; }
+.gen-error { font-size: 13px; color: #C0392B; margin-top: 8px; padding: 10px 14px; background: #fef2f2; border-radius: 8px; display: none; line-height: 1.6; }
+
+/* Report */
+.report-wrap { display: none; max-width: 760px; margin: 1.5rem auto 0; }
+.report-date { font-size: 12px; color: #aaa; text-align: right; margin-bottom: .75rem; }
+.card { background: #fff; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 24px rgba(0,0,0,.08); }
+.hero { background: #0F6E56; padding: 2.5rem 2rem; text-align: center; color: #fff; }
+.hero-eyebrow { font-size: 11px; letter-spacing: .15em; opacity: .7; margin-bottom: .75rem; }
+.hero-name { font-size: 28px; font-weight: 700; margin-bottom: .3rem; }
+.hero-job { font-size: 14px; opacity: .75; margin-bottom: 1.25rem; }
+.hero-badge { display: inline-block; background: rgba(255,255,255,.18); border: 1px solid rgba(255,255,255,.35); border-radius: 24px; padding: 7px 22px; font-size: 15px; font-weight: 600; }
+.body-pad { padding: 2rem; }
+.section { margin-bottom: 2rem; }
+.section:last-child { margin-bottom: 0; }
+.sec-label { font-size: 11px; letter-spacing: .1em; color: #aaa; font-weight: 600; margin-bottom: .5rem; }
+.sec-title { font-size: 17px; font-weight: 700; margin-bottom: .75rem; line-height: 1.5; }
+.sec-text { font-size: 14px; color: #555; line-height: 1.95; }
+.divline { height: 1px; background: #f0ece6; margin: 1.75rem 0; }
+.score-row { display: flex; align-items: center; gap: 18px; background: #f7f5f0; border-radius: 12px; padding: 1.1rem 1.4rem; margin-bottom: .875rem; flex-wrap: wrap; }
+.score-num { font-size: 40px; font-weight: 700; color: #0F6E56; line-height: 1; }
+.score-meta-sub { font-size: 12px; color: #aaa; margin-bottom: 4px; }
+.score-meta-label { font-size: 15px; font-weight: 700; color: #0F6E56; }
+.score-track { flex: 2; min-width: 120px; height: 6px; background: #e0ddd6; border-radius: 3px; overflow: hidden; }
+.score-fill { height: 100%; background: #1D9E75; border-radius: 3px; }
+.tag-row { display: flex; flex-wrap: wrap; gap: 7px; margin-top: .75rem; }
+.yes-tag { display: inline-block; background: #0F6E56; color: #fff; border-radius: 12px; font-size: 12px; padding: 3px 11px; font-weight: 600; }
+.answer-list { display: flex; flex-direction: column; gap: 8px; }
+.answer-item { background: #f7f5f0; border-radius: 10px; padding: .875rem 1rem; }
+.answer-q { font-size: 11px; color: #aaa; font-weight: 600; margin-bottom: 5px; }
+.answer-a { font-size: 14px; line-height: 1.75; }
+.title-cand { background: #f7f5f0; border-radius: 10px; padding: .75rem 1rem; margin-bottom: 6px; font-size: 14px; font-weight: 600; color: #0F6E56; }
+.msg-box { background: #f7f5f0; border-radius: 12px; padding: 1.25rem 1.4rem; }
+.msg-label { font-size: 11px; letter-spacing: .08em; color: #aaa; font-weight: 600; margin-bottom: .6rem; }
+.msg-text { font-size: 14px; line-height: 1.9; }
+.msg-from { font-size: 12px; color: #0F6E56; font-weight: 600; text-align: right; margin-top: .875rem; }
+.cta-blk { background: #0F6E56; border-radius: 14px; padding: 1.5rem; text-align: center; color: #fff; margin-top: 1.75rem; }
+.cta-title { font-size: 16px; font-weight: 700; margin-bottom: .4rem; }
+.cta-sub { font-size: 13px; opacity: .8; }
+.print-area { margin-top: 1.25rem; text-align: center; }
+.print-btn { display: inline-block; padding: 13px 40px; border-radius: 12px; font-size: 15px; font-weight: 700; font-family: inherit; background: #0F6E56; color: #fff; border: none; cursor: pointer; }
+.print-btn:hover { opacity: .85; }
+.print-hint { font-size: 12px; color: #aaa; margin-top: 8px; }
+.back-btn { display: inline-block; margin-top: 14px; font-size: 13px; color: #888; background: none; border: none; cursor: pointer; text-decoration: underline; font-family: inherit; }
+
+.footer-brand { text-align: center; margin-top: 2.5rem; padding-top: 1.8rem; border-top: 1px solid #e8e4de; }
+.brand-name { font-size: 14px; font-weight: 700; }
+.brand-sub { font-size: 12px; color: #aaa; }
+</style>
+</head>
+<body>
+<div class="page-wrap">
+
+<!-- ============ 診断シート ============ -->
+<div class="sheet" id="sheet-view">
+  <div class="header">
+    <div class="badge">マルシェ限定 · 無料配布</div>
+    <div class="main-title">あなたの話が、本になる。</div>
+    <div class="sub-title">電子書籍 出版診断シート</div>
+    <div class="lead">「自分には書けない」と思っているあなたへ。10分で、出版可能性を確かめてみましょう。</div>
+    <div class="name-row">
+      <div class="name-field"><label>お名前</label><input id="inp-name" type="text" placeholder="山田 太郎"></div>
+      <div class="name-field"><label>職業・肩書き</label><input id="inp-job" type="text" placeholder="コーチ / セラピスト など" style="width:220px;"></div>
+    </div>
+  </div>
+
+  <!-- STEP1 -->
+  <div class="step-section">
+    <div class="step-header"><span class="step-num">STEP 1</span><span class="step-title">出版適性チェック</span></div>
+    <div class="step-desc">YES が多いほど「今すぐ書ける」状態です。直感でどうぞ。</div>
+    <div>
+      <div class="q-row"><span class="q-num">Q1</span><span class="q-text">友人や知人から「それ、どうやってるの？」と聞かれることがある</span><div class="toggle-group"><button class="tbtn" onclick="tog(this,1,'yes')">YES</button><button class="tbtn" onclick="tog(this,1,'no')">NO</button></div></div>
+      <div class="q-row"><span class="q-num">Q2</span><span class="q-text">自分の仕事・趣味・経験で、周りより詳しいジャンルがある</span><div class="toggle-group"><button class="tbtn" onclick="tog(this,2,'yes')">YES</button><button class="tbtn" onclick="tog(this,2,'no')">NO</button></div></div>
+      <div class="q-row"><span class="q-num">Q3</span><span class="q-text">誰かの悩みを聞いて「それ、私も同じだった」と感じることがある</span><div class="toggle-group"><button class="tbtn" onclick="tog(this,3,'yes')">YES</button><button class="tbtn" onclick="tog(this,3,'no')">NO</button></div></div>
+      <div class="q-row"><span class="q-num">Q4</span><span class="q-text">「あの頃の自分に教えてあげたかった」ことが一つ以上ある</span><div class="toggle-group"><button class="tbtn" onclick="tog(this,4,'yes')">YES</button><button class="tbtn" onclick="tog(this,4,'no')">NO</button></div></div>
+      <div class="q-row"><span class="q-num">Q5</span><span class="q-text">失敗や苦労した経験から、誰かに伝えられる「学び」がある</span><div class="toggle-group"><button class="tbtn" onclick="tog(this,5,'yes')">YES</button><button class="tbtn" onclick="tog(this,5,'no')">NO</button></div></div>
+      <div class="q-row"><span class="q-num">Q6</span><span class="q-text">SNS・ブログ・日記など、文章を書いた経験が（少しでも）ある</span><div class="toggle-group"><button class="tbtn" onclick="tog(this,6,'yes')">YES</button><button class="tbtn" onclick="tog(this,6,'no')">NO</button></div></div>
+      <div class="q-row"><span class="q-num">Q7</span><span class="q-text">自分の考えや体験を、人に話すことが好き・得意な方だ</span><div class="toggle-group"><button class="tbtn" onclick="tog(this,7,'yes')">YES</button><button class="tbtn" onclick="tog(this,7,'no')">NO</button></div></div>
+    </div>
+    <div class="score-bar">
+      <div><div style="font-size:11px;color:#aaa;margin-bottom:2px;">YES の数</div><div style="font-size:30px;font-weight:700;color:#0F6E56;" id="score-num">0</div></div>
+      <div style="flex:1;"><div class="progress-track"><div class="progress-fill" id="progress-fill" style="width:0%;"></div></div><div class="score-hl" id="score-label"></div></div>
+    </div>
+  </div>
+
+  <!-- STEP2 -->
+  <div class="step-section">
+    <div class="step-header"><span class="step-num">STEP 2</span><span class="step-title">本のタネを探す</span></div>
+    <div class="step-desc">直感で OK。思いついたことをそのまま書いてみましょう。</div>
+    <div class="write-area"><div class="write-label">Q8</div><div class="write-q">あなたが「解決してきた悩み」や「乗り越えてきたこと」は何ですか？</div><div class="divider"></div><textarea id="ta-q8" class="write-input" placeholder="例：人見知りで仕事の話が苦手だったが、ある方法で克服した" rows="3"></textarea></div>
+    <div class="write-area"><div class="write-label">Q9</div><div class="write-q">周りの人がよく相談してくること、聞いてくることは何ですか？</div><div class="divider"></div><textarea id="ta-q9" class="write-input" placeholder="例：副業のはじめ方、子育てと仕事の両立 など" rows="3"></textarea></div>
+    <div class="write-area"><div class="write-label">Q10</div><div class="write-q">あなたの話を聞いた人が「それ、もっと聞きたい！」と言ったことは？</div><div class="divider"></div><textarea id="ta-q10" class="write-input" placeholder="印象に残っているエピソードや言葉をそのまま書いてみてください" rows="3"></textarea></div>
+    <div class="write-area" style="border-color:#5DCAA5;">
+      <div class="write-label" style="color:#0F6E56;">Q11</div>
+      <div class="write-q">この本を出すことで、あなたは何を実現したいですか？（複数選択可）</div>
+      <div class="divider"></div>
+      <div class="chip-group">
+        <button class="chip" data-group="Q11" onclick="togChip(this)">集客</button>
+        <button class="chip" data-group="Q11" onclick="togChip(this)">信頼づくり</button>
+        <button class="chip" data-group="Q11" onclick="togChip(this)">自己整理</button>
+        <button class="chip" data-group="Q11" onclick="togChip(this)">活動の認知拡大</button>
+        <button class="chip" data-group="Q11" onclick="togChip(this)">体験の共有</button>
+      </div>
+      <textarea id="ta-q11" class="write-input" placeholder="その他、自由に書いてください" rows="2" style="margin-top:12px;"></textarea>
+    </div>
+  </div>
+
+  <!-- STEP3 -->
+  <div class="step-section">
+    <div class="step-header"><span class="step-num">STEP 3</span><span class="step-title">読んでほしい人を決める</span></div>
+    <div class="step-desc">「誰のための本か」が明確になると、書くスピードが一気に上がります。</div>
+    <div class="reader-grid">
+      <div class="write-area" style="margin-bottom:0;"><div class="write-label">読んでほしい人</div><div class="write-q" style="font-size:13px;">年齢・職業・状況など</div><div class="divider"></div><textarea id="ta-reader" class="write-input" placeholder="例：30代の働くお母さん" rows="4"></textarea></div>
+      <div class="write-area" style="margin-bottom:0;"><div class="write-label">読んだ後に変わってほしいこと</div><div class="write-q" style="font-size:13px;">その人の何が変わってほしいですか？</div><div class="divider"></div><textarea id="ta-change" class="write-input" placeholder="例：最初の一歩を踏み出している" rows="4"></textarea></div>
+    </div>
+  </div>
+
+  <!-- GATE -->
+  <div class="gate" id="gate">
+    <div class="gate-title">ここまでで基本診断は完了です</div>
+    <div class="gate-desc">本気で出版を考えている方は、続けて「詳細診断」もどうぞ。<br>テーマの切り口・読者像・出版後の戦略まで、より深く整理できます（+5分）。</div>
+    <div class="gate-btns">
+      <button class="gate-btn-skip" onclick="skipDetail()">ここまでで終わる</button>
+      <button class="gate-btn-more" onclick="openDetail()">詳しく診断する（+5分）→</button>
+    </div>
+  </div>
+
+  <!-- DETAIL -->
+  <div class="detail-zone" id="detail-zone">
+    <div class="step-section">
+      <div class="step-header"><span class="step-num">STEP 4</span><span class="step-title">テーマ・切り口を深掘りする</span><span class="detail-flag">詳細診断</span></div>
+      <div class="step-desc">あなたの本を「他とは違う一冊」にするための質問です。</div>
+      <div class="write-area"><div class="write-label">Q12</div><div class="write-q">その悩みを、具体的にどんな方法・考え方で乗り越えましたか？</div><div class="divider"></div><textarea id="ta-q12" class="write-input" placeholder="例：毎朝5分だけ、ノートに今日の不安を書き出すようにした" rows="3"></textarea></div>
+      <div class="write-area"><div class="write-label">Q13</div><div class="write-q">同じテーマの本・発信と比べて、あなたならではの視点は何ですか？</div><div class="divider"></div><textarea id="ta-q13" class="write-input" placeholder="例：専門知識ではなく、当事者としての失敗談から語れること" rows="3"></textarea></div>
+      <div class="write-area"><div class="write-label">Q14</div><div class="write-q">もしタイトルを3つ考えるなら？（思いつくままでOK）</div><div class="divider"></div><textarea id="ta-q14" class="write-input" placeholder="例：①〇〇な私が変われた理由 ②〇〇のはじめかた ③〇〇を卒業する本" rows="3"></textarea></div>
+    </div>
+
+    <div class="step-section">
+      <div class="step-header"><span class="step-num">STEP 5</span><span class="step-title">読者像・コンセプトを精緻化する</span><span class="detail-flag">詳細診断</span></div>
+      <div class="step-desc">読者の解像度が上がるほど、本の言葉は強くなります。</div>
+      <div class="write-area"><div class="write-label">Q15</div><div class="write-q">その読者は今、具体的に何に困っていますか？</div><div class="divider"></div><textarea id="ta-q15" class="write-input" placeholder="例：毎晩、仕事の不安で眠れず、家族にも当たってしまう自分に落ち込んでいる" rows="3"></textarea></div>
+      <div class="write-area"><div class="write-label">Q16</div><div class="write-q">その読者が、これまで試してうまくいかなかったことは？</div><div class="divider"></div><textarea id="ta-q16" class="write-input" placeholder="例：自己啓発本を何冊も読んだが、結局続かなかった" rows="3"></textarea></div>
+      <div class="write-area"><div class="write-label">Q17</div><div class="write-q">なぜ「今」その人に届けたいのですか？</div><div class="divider"></div><textarea id="ta-q17" class="write-input" placeholder="例：自分自身が一番つらかった時期に、こんな本が欲しかったから" rows="3"></textarea></div>
+    </div>
+
+    <div class="step-section">
+      <div class="step-header"><span class="step-num">STEP 6</span><span class="step-title">集客・マネタイズ戦略を診断する</span><span class="detail-flag">詳細診断</span></div>
+      <div class="step-desc">本を「読まれた後」の動線まで考えておくと、出版の効果が最大化します。</div>
+      <div class="write-area"><div class="write-label">Q18</div><div class="write-q">出版後、本から読者をどんなサービス・商品につなげたいですか？</div><div class="divider"></div><textarea id="ta-q18" class="write-input" placeholder="例：個別相談、講座、コミュニティ など" rows="3"></textarea></div>
+      <div class="write-area">
+        <div class="write-label">Q19</div><div class="write-q">販売・配布したいチャネルは？（複数選択可）</div><div class="divider"></div>
+        <div class="chip-group">
+          <button class="chip" data-group="Q19" onclick="togChip(this)">Kindle</button>
+          <button class="chip" data-group="Q19" onclick="togChip(this)">note</button>
+          <button class="chip" data-group="Q19" onclick="togChip(this)">BASE</button>
+          <button class="chip" data-group="Q19" onclick="togChip(this)">自社サイト</button>
+          <button class="chip" data-group="Q19" onclick="togChip(this)">メルマガ特典</button>
+          <button class="chip" data-group="Q19" onclick="togChip(this)">未定</button>
+        </div>
+      </div>
+      <div class="write-area">
+        <div class="write-label">Q20</div><div class="write-q">価格のイメージは？</div><div class="divider"></div>
+        <div class="single-row">
+          <button class="single-chip" onclick="togSingle(this)">無料配布</button>
+          <button class="single-chip" onclick="togSingle(this)">100〜500円</button>
+          <button class="single-chip" onclick="togSingle(this)">500〜1500円</button>
+          <button class="single-chip" onclick="togSingle(this)">1500円以上</button>
+          <button class="single-chip" onclick="togSingle(this)">まだ決めていない</button>
+        </div>
+      </div>
+      <div class="write-area">
+        <div class="write-label">Q21</div><div class="write-q">今、発信している媒体はありますか？（複数選択可）</div><div class="divider"></div>
+        <div class="chip-group">
+          <button class="chip" data-group="Q21" onclick="togChip(this)">Instagram</button>
+          <button class="chip" data-group="Q21" onclick="togChip(this)">X(Twitter)</button>
+          <button class="chip" data-group="Q21" onclick="togChip(this)">ブログ</button>
+          <button class="chip" data-group="Q21" onclick="togChip(this)">YouTube</button>
+          <button class="chip" data-group="Q21" onclick="togChip(this)">LINE公式</button>
+          <button class="chip" data-group="Q21" onclick="togChip(this)">メルマガ</button>
+          <button class="chip" data-group="Q21" onclick="togChip(this)">特になし</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MEMO -->
+  <div class="step-section">
+    <div class="step-header"><span class="step-num">MEMO</span><span class="step-title">担当者メモ（レポートに反映されます）</span></div>
+    <div class="step-desc">相談中に気づいたこと、相談者の強み、印象的な言葉などを書いておきましょう。</div>
+    <div class="message-area"><textarea id="ta-msg" class="message-input" placeholder="例：話し方がとても情熱的で、子育て経験の話に説得力があった。"></textarea></div>
+  </div>
+
+  <div class="footer-brand">
+    <div class="brand-name">経営構造編集 参謀</div>
+    <div class="brand-sub">あなたの知識・経験・想いを、一冊の本と集客の仕組みに変えます</div>
+  </div>
+
+  <div class="staff-bar no-print">
+    <div class="staff-label">担当者操作 ― 記入完了後にボタンを押してください</div>
+    <button class="btn-gen" id="btn-gen" onclick="generateReport()">診断レポートを生成する →</button>
+    <div class="gen-status" id="gen-status"></div>
+    <div class="gen-error" id="gen-error"></div>
+  </div>
+</div>
+
+<!-- ============ レポート表示 ============ -->
+<div class="report-wrap" id="report-wrap">
+  <div class="report-date" id="rp-date"></div>
+  <div class="card">
+    <div class="hero">
+      <div class="hero-eyebrow">電子書籍 出版診断レポート</div>
+      <div class="hero-name" id="rp-name">—</div>
+      <div class="hero-job" id="rp-job">—</div>
+      <div class="hero-badge" id="rp-type">—</div>
+    </div>
+    <div class="body-pad">
+      <div class="section">
+        <div class="sec-label">STEP 1 · 出版適性スコア</div>
+        <div class="score-row">
+          <div class="score-num" id="rp-score">0</div>
+          <div style="flex:1;min-width:80px;"><div class="score-meta-sub">7項目中</div><div class="score-meta-label" id="rp-score-label">—</div></div>
+          <div class="score-track"><div class="score-fill" id="rp-progress" style="width:0%;"></div></div>
+        </div>
+        <div class="sec-text" id="rp-score-comment">—</div>
+        <div class="tag-row" id="rp-yes-tags"></div>
+      </div>
+
+      <div class="divline"></div>
+
+      <div class="section">
+        <div class="sec-label">あなたが書けそうな本</div>
+        <div class="sec-title" id="rp-book-title">—</div>
+        <div class="sec-text" id="rp-book-comment">—</div>
+      </div>
+
+      <div class="divline"></div>
+
+      <div class="section">
+        <div class="sec-label">本が届く読者像</div>
+        <div class="sec-text" id="rp-reader-comment">—</div>
+      </div>
+
+      <div class="divline" id="rp-detail-divider1" style="display:none;"></div>
+
+      <div class="section" id="rp-concept-section" style="display:none;">
+        <div class="sec-label">本のコンセプト・差別化ポイント</div>
+        <div class="sec-text" id="rp-concept-comment">—</div>
+      </div>
+
+      <div class="divline" id="rp-detail-divider2" style="display:none;"></div>
+
+      <div class="section" id="rp-titles-section" style="display:none;">
+        <div class="sec-label">タイトル候補</div>
+        <div id="rp-title-candidates"></div>
+      </div>
+
+      <div class="divline" id="rp-detail-divider3" style="display:none;"></div>
+
+      <div class="section" id="rp-monetize-section" style="display:none;">
+        <div class="sec-label">出版後の集客・マネタイズ戦略</div>
+        <div class="sec-text" id="rp-monetize-comment">—</div>
+      </div>
+
+      <div class="divline"></div>
+
+      <div class="section">
+        <div class="sec-label">記入内容まとめ</div>
+        <div class="answer-list" id="rp-answers"></div>
+      </div>
+
+      <div class="divline"></div>
+
+      <div class="section">
+        <div class="sec-label">担当者より</div>
+        <div class="msg-box">
+          <div class="msg-label">今日お話しした中で、あなたへのメッセージ</div>
+          <div class="msg-text" id="rp-msg">—</div>
+          <div class="msg-from">経営構造編集 参謀</div>
+        </div>
+      </div>
+
+      <div class="cta-blk">
+        <div class="cta-title">次のステップ：出版相談（無料 30分）</div>
+        <div class="cta-sub">このレポートを持参するだけ。あなたのテーマを一緒に形にします。</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="print-area no-print">
+    <button class="print-btn" onclick="window.print()">このレポートをPDFで保存する ↓</button>
+    <div class="print-hint">① ボタンを押す　② 送信先を「PDFに保存」に変更　③ 保存</div><br>
+    <button class="back-btn" onclick="backToSheet()">← シートに戻る</button>
+  </div>
+</div>
+
+</div>
+
+<script>
+const scores = {};
+let selectedPrice = '';
+let detailOpen = false;
+const qLabels = ['', 'まだこれから', 'まだこれから', '書けます', '書けます', '十分あります', '十分あります', '今すぐ書こう！'];
+const qTexts = {1:'どうやってるの？と聞かれる',2:'詳しいジャンルがある',3:'同じだったと感じる',4:'あの頃の自分に教えたかった',5:'伝えられる学びがある',6:'文章を書いた経験がある',7:'話すことが好き・得意'};
+
+function tog(btn, q, val) {
+  btn.closest('.q-row').querySelectorAll('.tbtn').forEach(b => b.classList.remove('is-yes', 'is-no'));
+  btn.classList.add(val === 'yes' ? 'is-yes' : 'is-no');
+  scores[q] = val;
+  const yes = Object.values(scores).filter(v => v === 'yes').length;
+  document.getElementById('score-num').textContent = yes;
+  document.getElementById('progress-fill').style.width = (yes / 7 * 100) + '%';
+  document.getElementById('score-label').textContent = yes > 0 ? qLabels[yes] : '';
+}
+function togChip(chip) { chip.classList.toggle('is-selected'); }
+function togSingle(btn) {
+  document.querySelectorAll('.single-chip').forEach(b => b.classList.remove('is-selected'));
+  btn.classList.add('is-selected');
+  selectedPrice = btn.textContent;
+}
+function openDetail() { detailOpen = true; document.getElementById('detail-zone').style.display = 'block'; document.getElementById('gate').style.display = 'none'; }
+function skipDetail() { detailOpen = false; document.getElementById('gate').style.display = 'none'; }
+function val(id) { const el = document.getElementById(id); return el ? (el.value || '') : ''; }
+function chipsByGroup(group) { return [...document.querySelectorAll(`.chip[data-group="${group}"].is-selected`)].map(c => c.textContent).join('、'); }
+
+function backToSheet(){
+  document.getElementById('report-wrap').style.display='none';
+  document.getElementById('sheet-view').style.display='block';
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+async function generateReport() {
+  const btn = document.getElementById('btn-gen');
+  const status = document.getElementById('gen-status');
+  const errBox = document.getElementById('gen-error');
+  btn.disabled = true;
+  errBox.style.display = 'none';
+  status.textContent = 'AIが診断レポートを生成しています...';
+
+  const name = val('inp-name') || 'ご相談者';
+  const job = val('inp-job');
+  const yesCount = Object.values(scores).filter(v => v === 'yes').length;
+  const yesItems = Object.entries(scores).filter(([,v]) => v === 'yes').map(([k]) => qTexts[k]).join('、') || 'なし';
+  const noItems = Object.entries(scores).filter(([,v]) => v === 'no').map(([k]) => qTexts[k]).join('、') || 'なし';
+  const q11chips = chipsByGroup('Q11') || '（未選択）';
+  const q19chips = chipsByGroup('Q19') || '（未選択）';
+  const q21chips = chipsByGroup('Q21') || '（未選択）';
+
+  const payload = {
+    name, job, yesCount, yesItems, noItems,
+    q8: val('ta-q8'), q9: val('ta-q9'), q10: val('ta-q10'),
+    q11chips, q11free: val('ta-q11'),
+    reader: val('ta-reader'), change: val('ta-change'),
+    detailOpen,
+    q12: val('ta-q12'), q13: val('ta-q13'), q14: val('ta-q14'),
+    q15: val('ta-q15'), q16: val('ta-q16'), q17: val('ta-q17'),
+    q18: val('ta-q18'), q19chips, price: selectedPrice, q21chips,
+    msg: val('ta-msg')
+  };
+
+  try {
+    const res = await fetch('/api/generate-report', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    const json = await res.json();
+    if (!res.ok) throw new Error(json.error || `HTTP ${res.status}`);
+
+    // ヒーロー
+    document.getElementById('rp-name').textContent = name + ' 様';
+    document.getElementById('rp-job').textContent = job || '—';
+    document.getElementById('rp-type').textContent = json.typeLabel || '—';
+    document.getElementById('rp-score').textContent = yesCount;
+    document.getElementById('rp-score-label').textContent = qLabels[yesCount] || '—';
+    document.getElementById('rp-progress').style.width = (yesCount / 7 * 100) + '%';
+    document.getElementById('rp-score-comment').textContent = json.scoreComment || '';
+    document.getElementById('rp-yes-tags').innerHTML = Object.entries(scores).filter(([,v]) => v === 'yes').map(([k]) => `<span class="yes-tag">${qTexts[k]}</span>`).join('');
+    document.getElementById('rp-book-title').textContent = json.bookTitle || '';
+    document.getElementById('rp-book-comment').textContent = json.bookComment || '';
+    document.getElementById('rp-reader-comment').textContent = json.readerComment || '';
+    document.getElementById('rp-msg').textContent = val('ta-msg') || '（担当者メモが未入力です）';
+    document.getElementById('rp-date').textContent = '診断日：' + new Date().toLocaleDateString('ja-JP') + '　　経営構造編集 参謀';
+
+    // 詳細項目
+    if (detailOpen && json.conceptComment) {
+      document.getElementById('rp-detail-divider1').style.display = 'block';
+      document.getElementById('rp-concept-section').style.display = 'block';
+      document.getElementById('rp-concept-comment').textContent = json.conceptComment;
+    }
+    if (detailOpen && json.titleCandidates && json.titleCandidates.length) {
+      document.getElementById('rp-detail-divider2').style.display = 'block';
+      document.getElementById('rp-titles-section').style.display = 'block';
+      document.getElementById('rp-title-candidates').innerHTML = json.titleCandidates.map(t => `<div class="title-cand">${t}</div>`).join('');
+    }
+    if (detailOpen && json.monetizeComment) {
+      document.getElementById('rp-detail-divider3').style.display = 'block';
+      document.getElementById('rp-monetize-section').style.display = 'block';
+      document.getElementById('rp-monetize-comment').textContent = json.monetizeComment;
+    }
+
+    // 記入内容まとめ
+    let answersHtml = `
+      <div class="answer-item"><div class="answer-q">解決してきた悩み・乗り越えてきたこと</div><div class="answer-a">${val('ta-q8') || '（未入力）'}</div></div>
+      <div class="answer-item"><div class="answer-q">よく相談されること</div><div class="answer-a">${val('ta-q9') || '（未入力）'}</div></div>
+      <div class="answer-item"><div class="answer-q">「もっと聞きたい」と言われたこと</div><div class="answer-a">${val('ta-q10') || '（未入力）'}</div></div>
+      <div class="answer-item"><div class="answer-q">出版で実現したいこと</div><div class="answer-a">${q11chips}${val('ta-q11') ? ' / ' + val('ta-q11') : ''}</div></div>
+      <div class="answer-item"><div class="answer-q">読んでほしい人</div><div class="answer-a">${val('ta-reader') || '（未入力）'}</div></div>
+      <div class="answer-item"><div class="answer-q">読んだ後に変わってほしいこと</div><div class="answer-a">${val('ta-change') || '（未入力）'}</div></div>
+    `;
+    if (detailOpen) {
+      answersHtml += `
+      <div class="answer-item"><div class="answer-q">悩みを乗り越えた具体的な方法</div><div class="answer-a">${val('ta-q12') || '（未入力）'}</div></div>
+      <div class="answer-item"><div class="answer-q">独自の視点・差別化ポイント</div><div class="answer-a">${val('ta-q13') || '（未入力）'}</div></div>
+      <div class="answer-item"><div class="answer-q">出版後につなげたいサービス・商品</div><div class="answer-a">${val('ta-q18') || '（未入力）'}</div></div>
+      <div class="answer-item"><div class="answer-q">販売・配布チャネル / 価格 / 既存媒体</div><div class="answer-a">${q19chips || '未定'} ／ ${selectedPrice || '未定'} ／ ${q21chips || 'なし'}</div></div>
+      `;
+    }
+    document.getElementById('rp-answers').innerHTML = answersHtml;
+
+    document.getElementById('sheet-view').style.display = 'none';
+    document.getElementById('report-wrap').style.display = 'block';
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    status.textContent = '';
+    btn.disabled = false;
+  } catch (e) {
+    errBox.textContent = 'エラー：' + e.message;
+    errBox.style.display = 'block';
+    status.textContent = '';
+    btn.disabled = false;
+  }
+}
+</script>
+</body>
+</html>
